@@ -29,6 +29,7 @@ def checkfiles(guild):
         joinguild(guild)
         return
 
+
 def joinguild(guild):
     if os.path.exists(f'./guildfiles/{guild}.json') == True:
         return
@@ -54,9 +55,17 @@ def zeros(number):
 
 def gettime(time, course, converter):
     #change time to seconds
-    date_time = datetime.datetime.strptime(time, "%M:%S.%f")
-    a_timedelta = date_time - datetime.datetime(1900, 1, 1)
-    seconds = a_timedelta.total_seconds()
+    try:
+        date_time = datetime.datetime.strptime(time, "%M:%S.%f")
+        a_timedelta = date_time - datetime.datetime(1900, 1, 1)
+        seconds = a_timedelta.total_seconds()
+    except:
+        try:
+            date_time = datetime.datetime.strptime(time, "%S.%f")
+            a_timedelta = date_time - datetime.datetime(1900, 1, 1)
+            seconds = a_timedelta.total_seconds()
+        except:
+            return None
 
     #convert
     if course == 'scy':
@@ -65,7 +74,6 @@ def gettime(time, course, converter):
         newtime = seconds*converter
 
     newtime = round(newtime, 2)
-    print(newtime)
     #change time back to 00:00.00
     newtime = divmod(newtime, 60)
     t = newtime[0]
@@ -73,8 +81,10 @@ def gettime(time, course, converter):
     _min = int(t)
     t2 = round(t2, 2)
     sec = zeros(t2)
-
-    return f"{_min:02d}:{sec}"
+    if _min == 0:
+        return f"{sec}"
+    else:
+        return f"{_min:02d}:{sec}"
 
 
 def check_event(event):

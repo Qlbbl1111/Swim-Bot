@@ -84,12 +84,12 @@ async def help(ctx):
           "value": "Used to bring up this menu."
         },
         {
-          "name": f"{prefix}convert",
-          "value": "Used to convert times."
+          "name": f"{prefix}test",
+          "value": "Used to test the bot."
         },
         {
-          "name": f"{prefix}test",
-          "value": f"Used to test the bot.\nFormat is ```{prefix}convert course[scy/lcm] event[200 free] gender[m/f] time[00:00.00]```"
+          "name": f"{prefix}convert",
+          "value": f"Used to convert times.\nFormat is `{prefix}convert course[scy/lcm] time[00:00.00] event`"
         }
       ]
     }
@@ -106,24 +106,122 @@ async def test(ctx):
 async def test_error(ctx, error):
     await ctx.send('Somthing went wrong')
  
+#Test the bot
+@bot.command()
+async def events(ctx):
+    checkfiles(ctx.guild.id)
+    await ctx.send(content=None, embed=discord.Embed.from_dict(
+    {
+      "title": "Events that can be converted:",
+      "color": 0,
+      "description": "",
+      "timestamp": "",
+      "author": {
+        "name": "",
+        "icon_url": ""
+      },
+      "image": {},
+      "thumbnail": {},
+      "footer": {},
+      "fields": [
+        {
+      "name": "LCM or SCY:",
+      "value":  '''
+                - 50 free
+                - 100 free
+                - 200 free
+                - 400 free
+                - 800 free
+                - 1500 free
+                - 100 free
+                - 200 free
+                - 100 back
+                - 200 back
+                - 100 breast
+                - 200 breast
+                - 200 IM
+                - 400 IM
+
+                '''
+        }
+      ]
+    }
+  ))
+
 
 #Time converter
 @bot.command()
 async def convert(ctx, course, time, *event):
     checkfiles(ctx.guild.id)
     event = event[0]+ ' ' + event[1]
-    print(course, time, event)
 
-    if course == 'lcm':
+    if course.lower() == 'lcm':
         newtime = lcm(time, event)
-        print(newtime)
         if newtime != None:
-            await ctx.send(f"{time} in LCM is {newtime} in SCY.")
-    elif course == 'scy':
+            await ctx.send(content=None, embed=discord.Embed.from_dict(
+    {
+      "title": "Converted LCM to SCY",
+      "color": 0,
+      "description": f"LCM: {time}\n SCY: {newtime}",
+      "timestamp": "",
+      "author": {
+        "name": "",
+        "icon_url": ""
+      },
+      "image": {},
+      "thumbnail": {},
+      "footer": {
+        "text": "If you think this is wrong please report it.",
+
+      },
+        "fields": [
+        {
+      "name": "LCM:",
+      "value": f"{time}",
+        },
+        {
+      "name": "SCY:",
+      "value": f"{newtime}",
+        }
+      ]
+    }
+))
+        else:
+            pass
+
+    elif course.lower() == 'scy':
         newtime = scy(time, event)
-        print(newtime)
         if newtime != None:
-            await ctx.send(f"{time} in SCY is {newtime} in LCM.")
+            await ctx.send(content=None, embed=discord.Embed.from_dict(
+    {
+      "title": "Converted SCY to LCM",
+      "color": 0,
+      "description": "",
+      "timestamp": "",
+      "author": {
+        "name": "",
+        "icon_url": ""
+      },
+      "image": {},
+      "thumbnail": {},
+      "footer": {
+        "text": "If you think this is wrong please report it.",
+
+      },
+      "fields": [
+        {
+      "name": "SCY:",
+      "value": f"{time}",
+        },
+        {
+      "name": "LCM:",
+      "value": f"{newtime}",
+        }
+      ]
+    }
+))
+        else:
+            pass
     else:
         newtime = None
 
@@ -143,24 +241,8 @@ async def convert(ctx, course, time, *event):
       "footer": {},
       "fields": [
                     {
-                        "name": f"Events:",
-                        "value": '''
-                                 - 50 free
-                                 - 100 free
-                                 - 200 free
-                                 - 400 free
-                                 - 800 free
-                                 - 1500 free
-                                 - 100 free
-                                 - 200 free
-                                 - 100 back
-                                 - 200 back
-                                 - 100 breast
-                                 - 200 breast
-                                 - 200 IM
-                                 - 400 IM
-
-                                '''
+                        "name": "To view available events run:",
+                        "value": f"{prefix}events"
                     }
       ]
     }
@@ -169,45 +251,7 @@ async def convert(ctx, course, time, *event):
 @convert.error
 async def convert_error(ctx, error):
     if isinstance(error, commands.BadArgument):
-        await ctx.send(content=None, embed=discord.Embed.from_dict(
-    {
-      "title": "Error: BadArgument",
-      "color": 0,
-      "description": f"Command format is: {prefix}convert course[scy/lcm] event gender[m/f] time[00:00.00]",
-      "timestamp": "",
-      "author": {
-        "name": "",
-        "icon_url": ""
-      },
-      "image": {},
-      "thumbnail": {},
-      "footer": {},
-      "fields": [
-                    {
-                        "name": f"Events:",
-                        "value": '''
-                                 50 free\n
-                                 100 free\n
-                                 200 free\n
-                                 400 free\n
-                                 800 free\n
-                                 1500 free\n
-                                 100 free\n
-                                 200 free\n
-                                 100 back\n
-                                 200 back\n
-                                 100 breast\n
-                                 200 breast\n
-                                 200 IM\n
-                                 400 IM
-
-                                '''
-                    }
-      ]
-    }
-  ))
-
-
+        await ctx.send('Somthing went wrong')
 
 
 
