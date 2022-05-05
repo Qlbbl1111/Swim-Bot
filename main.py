@@ -89,7 +89,7 @@ async def help(ctx):
         },
         {
           "name": f"{prefix}test",
-          "value": "Used to test the bot."
+          "value": f"Used to test the bot.\nFormat is ```{prefix}convert course[scy/lcm] event[200 free] gender[m/f] time[00:00.00]```"
         }
       ]
     }
@@ -109,13 +109,108 @@ async def test_error(ctx, error):
 
 #Time converter
 @bot.command()
-async def convert(ctx):
+async def convert(ctx, course, time, *event):
     checkfiles(ctx.guild.id)
-    await ctx.send('All is good here!')
+    event = event[0]+ ' ' + event[1]
+    print(course, time, event)
+
+    if course == 'lcm':
+        newtime = lcm(time, event)
+        print(newtime)
+        if newtime != None:
+            await ctx.send(f"{time} in LCM is {newtime} in SCY.")
+    elif course == 'scy':
+        newtime = scy(time, event)
+        print(newtime)
+        if newtime != None:
+            await ctx.send(f"{time} in SCY is {newtime} in LCM.")
+    else:
+        newtime = None
+
+    if newtime == None:
+        await ctx.send(content=None, embed=discord.Embed.from_dict(
+    {
+      "title": "Error: BadArgument",
+      "color": 0,
+      "description": f"Command format is: \n`{prefix}convert course[scy/lcm] time[00:00.00] event`",
+      "timestamp": "",
+      "author": {
+        "name": "",
+        "icon_url": ""
+      },
+      "image": {},
+      "thumbnail": {},
+      "footer": {},
+      "fields": [
+                    {
+                        "name": f"Events:",
+                        "value": '''
+                                 - 50 free
+                                 - 100 free
+                                 - 200 free
+                                 - 400 free
+                                 - 800 free
+                                 - 1500 free
+                                 - 100 free
+                                 - 200 free
+                                 - 100 back
+                                 - 200 back
+                                 - 100 breast
+                                 - 200 breast
+                                 - 200 IM
+                                 - 400 IM
+
+                                '''
+                    }
+      ]
+    }
+  ))
 
 @convert.error
 async def convert_error(ctx, error):
-    await ctx.send('Somthing went wrong') 
+    if isinstance(error, commands.BadArgument):
+        await ctx.send(content=None, embed=discord.Embed.from_dict(
+    {
+      "title": "Error: BadArgument",
+      "color": 0,
+      "description": f"Command format is: {prefix}convert course[scy/lcm] event gender[m/f] time[00:00.00]",
+      "timestamp": "",
+      "author": {
+        "name": "",
+        "icon_url": ""
+      },
+      "image": {},
+      "thumbnail": {},
+      "footer": {},
+      "fields": [
+                    {
+                        "name": f"Events:",
+                        "value": '''
+                                 50 free\n
+                                 100 free\n
+                                 200 free\n
+                                 400 free\n
+                                 800 free\n
+                                 1500 free\n
+                                 100 free\n
+                                 200 free\n
+                                 100 back\n
+                                 200 back\n
+                                 100 breast\n
+                                 200 breast\n
+                                 200 IM\n
+                                 400 IM
+
+                                '''
+                    }
+      ]
+    }
+  ))
+
+
+
+
+
 
 #RUN
 if __name__ == "__main__":
