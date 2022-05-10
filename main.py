@@ -133,8 +133,8 @@ async def events(ctx):
                 - 400 free
                 - 800 free
                 - 1500 free
-                - 100 free
-                - 200 free
+                - 100 fly
+                - 200 fly
                 - 100 back
                 - 200 back
                 - 100 breast
