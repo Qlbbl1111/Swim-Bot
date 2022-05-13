@@ -88,10 +88,9 @@ def gettime(time, course, converter):
 
 
 def check_event(event):
-    _event = event.lower()
 
-    if _event in converters:
-        x = converters.get(event)
+    if event.lower() in converters:
+        x = converters.get(event.lower())
         return x
     else:
         return None
