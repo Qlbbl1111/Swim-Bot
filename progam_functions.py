@@ -4,24 +4,6 @@ from time import gmtime
 from time import strftime
 from decimal import getcontext, Decimal
 
-converters = {
-"50 free": 0.871,
-"100 free": 0.874,
-"200 free": 0.874,
-"400 free": 1.112,
-"800 free": 1.120,
-"1500 free": 0.975,
-"100 fly": 0.877,
-"200 fly": 0.881,
-"100 back": 0.853,
-"200 back": 0.857,
-"100 breast": 0.870,
-"200 breast": 0.878,
-"200 im": 0.867,
-"400 im": 0.876
-}
-
-
 def checkfiles(guild):
     if os.path.isdir(f'./guildfiles/{guild}.json') == True:
         return
@@ -52,30 +34,24 @@ def zeros(number):
         y = x
     return y
 
-
-def gettime(time, course, converter):
+def seconds(time):
+    time = time
     #change time to seconds
     try:
         date_time = datetime.datetime.strptime(time, "%M:%S.%f")
         a_timedelta = date_time - datetime.datetime(1900, 1, 1)
-        seconds = a_timedelta.total_seconds()
+        return a_timedelta.total_seconds()
     except:
         try:
             date_time = datetime.datetime.strptime(time, "%S.%f")
             a_timedelta = date_time - datetime.datetime(1900, 1, 1)
-            seconds = a_timedelta.total_seconds()
+            return a_timedelta.total_seconds()
         except:
             return None
 
-    #convert
-    if course == 'scy':
-        newtime = seconds/converter
-    if course == 'lcm':
-        newtime = seconds*converter
-
-    newtime = round(newtime, 2)
+def swimtime(time):
     #change time back to 00:00.00
-    newtime = divmod(newtime, 60)
+    newtime = divmod(time, 60)
     t = newtime[0]
     t2 = newtime[1]
     _min = int(t)
@@ -86,32 +62,73 @@ def gettime(time, course, converter):
     else:
         return f"{_min:02d}:{sec}"
 
-
-def check_event(event):
-
-    if event.lower() in converters:
-        x = converters.get(event.lower())
-        return x
+def gettime(course, time, distance, stroke):
+    if course.lower() == "lcm":
+        course = 0
+    elif course.lower() == "scy":
+        course = 1
     else:
-        return None
+        return "Error"
 
+    if course == 1 and distance == "500" or course == 1 and distance == "1000" or course == 1 and distance == "1650" or course == 0 and distance == "400" or course == 0 and distance == "800" or course == 0 and distance == "1500":
+        return "Mistake"
 
-def lcm(time, event):
-    x = check_event(event)
+    x = seconds(time)
 
-    if x == None:
-        return None
-    else:
-        return gettime(time, 'lcm', x)
+    converters = {
+"fly": {
+    "50": [(x-0.7)/1.11, x*1.11+0.7],
 
+    "100": [(x-1.4)/1.11, x*1.11+1.4],
 
-def scy(time, event):
-    x = check_event(event)
+    "200": [(x-2.8)/1.11, x*1.11+2.6]
+    },
 
-    if x == None:
-        return None
-    else:
-        return gettime(time, 'scy', x)
+"back": {
+    "50": [(x-0.6)/1.11, x*1.11+0.6],
+
+    "100": [(x-1.2)/1.11, x*1.11+1.2],
+
+    "200": [(x-2.4)/1.11, x*1.11+2.4]
+    },
+
+"breast": {
+    "50": [(x-1.0)/1.11, x*1.11+1.0],
+
+    "100": [(x-2.0)/1.11, x*1.11+2.0],
+
+    "200": [(x-4.0)/1.11, x*1.11+4.0]
+    },
+
+"free": {
+    "50": [(x-0.8)/1.11, x*1.11+0.8],
+
+    "100": [(x-1.6)/1.11, x*1.11+1.6],
+
+    "200": [(x-3.2)/1.11, x*1.11+3.2],
+
+    "400": [x/0.8925, x*0.8925],
+    "500": [x/0.8925, x*0.8925],
+
+    "800": [x/0.8925, x*0.8925],
+    "1000": [x/0.8925, x*0.8925],
+
+    "1500": [x/1.02, x*1.02],
+    "1650": [x/1.02, x*1.02]
+    },
+
+"im": {
+    "200": [(x-3.2)/1.11, x*1.11+3.2],
+
+    "400": [(x-6.4)/1.11, x*1.11+6.4]
+    },
+}
+    try:
+        newtime = converters.get(stroke.lower()).get(distance.lower())[course]
+    except:
+        return "Error"
+
+    return swimtime(newtime)
     
 
 

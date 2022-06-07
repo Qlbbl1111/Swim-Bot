@@ -89,7 +89,7 @@ async def help(ctx):
         },
         {
           "name": f"{prefix}convert",
-          "value": f"Used to convert times.\nFormat is `{prefix}convert course[scy/lcm] time[00:00.00] event`"
+          "value": f"Command format is: \n`{prefix}convert course[scy/lcm] time[00:00.00] distance[100] stroke[free]`"
         }
       ]
     }
@@ -98,21 +98,21 @@ async def help(ctx):
 
 #Test the bot
 @bot.command()
-async def test(ctx):
+async def test(ctx, *arg):
     checkfiles(ctx.guild.id)
-    await ctx.send('All is good here!')
+    await ctx.send(f'All is good here!\n{arg}')
 
 @test.error
 async def test_error(ctx, error):
     await ctx.send('Somthing went wrong')
  
-#Test the bot
+#All the available events
 @bot.command()
 async def events(ctx):
     checkfiles(ctx.guild.id)
     await ctx.send(content=None, embed=discord.Embed.from_dict(
     {
-      "title": "Events that can be converted:",
+      "title": "",
       "color": 0,
       "description": "",
       "timestamp": "",
@@ -125,20 +125,32 @@ async def events(ctx):
       "footer": {},
       "fields": [
         {
-      "name": "LCM or SCY:",
+      "name": "Events that can be converted:",
       "value":  '''
-                - 50 free
-                - 100 free
-                - 200 free
-                - 400 free
-                - 800 free
-                - 1500 free
-                - 100 fly
-                - 200 fly
-                - 100 back
-                - 200 back
-                - 100 breast
-                - 200 breast
+                **Freestyle:**
+                - 50 Free
+                - 100 Free
+                - 200 Free
+                - 500 Free <=> 400 Free
+                - 1000 Free <=> 800 Free
+                - 1650 Free <=> 1500 Free
+
+                **Butterfly:**
+                - 50 Fly
+                - 100 Fly
+                - 200 Fly
+
+                **Backstroke:**
+                - 50 Back
+                - 100 Back
+                - 200 Back
+
+                **Breaststroke:**
+                - 50 Breast
+                - 100 Breast
+                - 200 Breast
+
+                **Individual Medley:**
                 - 200 IM
                 - 400 IM
 
@@ -151,18 +163,20 @@ async def events(ctx):
 
 #Time converter
 @bot.command()
-async def convert(ctx, course, time, *event):
+async def convert(ctx, course, time, distance, stroke):
     checkfiles(ctx.guild.id)
-    event = event[0]+ ' ' + event[1]
-
+    newtime = gettime(course, time, distance, stroke)
     if course.lower() == 'lcm':
-        newtime = lcm(time, event)
-        if newtime != None:
-            await ctx.send(content=None, embed=discord.Embed.from_dict(
+        course = ["LCM", "SCY"]
+    elif course.lower() == 'scy':
+        course = ["SCY", "LCM"]
+
+    if newtime != "Error" and newtime != "Mistake":
+        await ctx.send(content=None, embed=discord.Embed.from_dict(
     {
-      "title": "Converted LCM to SCY",
+      "title": f"Converted {course[0]} to {course[1]}",
       "color": 0,
-      "description": f"LCM: {time}\n SCY: {newtime}",
+      "description": f"**Event:** {distance} {stroke}",
       "timestamp": "",
       "author": {
         "name": "",
@@ -171,32 +185,27 @@ async def convert(ctx, course, time, *event):
       "image": {},
       "thumbnail": {},
       "footer": {
-        "text": "If you think this is wrong please report it.",
+        "text": "",
 
       },
         "fields": [
         {
-      "name": "LCM:",
+      "name": f"{course[0]}:",
       "value": f"{time}",
         },
         {
-      "name": "SCY:",
+      "name": f"{course[1]}:",
       "value": f"{newtime}",
         }
       ]
     }
 ))
-        else:
-            pass
-
-    elif course.lower() == 'scy':
-        newtime = scy(time, event)
-        if newtime != None:
-            await ctx.send(content=None, embed=discord.Embed.from_dict(
+    elif newtime == "Error":
+        await ctx.send(content=None, embed=discord.Embed.from_dict(
     {
-      "title": "Converted SCY to LCM",
+      "title": "Error: BadArgument",
       "color": 0,
-      "description": "",
+      "description": f"Command format is: \n`{prefix}convert course[scy/lcm] time[00:00.00] distance[100] stroke[free]`",
       "timestamp": "",
       "author": {
         "name": "",
@@ -204,33 +213,21 @@ async def convert(ctx, course, time, *event):
       },
       "image": {},
       "thumbnail": {},
-      "footer": {
-        "text": "If you think this is wrong please report it.",
-
-      },
+      "footer": {},
       "fields": [
-        {
-      "name": "SCY:",
-      "value": f"{time}",
-        },
-        {
-      "name": "LCM:",
-      "value": f"{newtime}",
-        }
+                    {
+                        "name": "To view available events run:",
+                        "value": f"{prefix}events"
+                    }
       ]
     }
-))
-        else:
-            pass
-    else:
-        newtime = None
-
-    if newtime == None:
+  ))
+    elif newtime == "Mistake":
         await ctx.send(content=None, embed=discord.Embed.from_dict(
     {
-      "title": "Error: BadArgument",
+      "title": "Error: Invalid Conversion",
       "color": 0,
-      "description": f"Command format is: \n`{prefix}convert course[scy/lcm] time[00:00.00] event`",
+      "description": f"{distance} {stroke} can't be converted to {course[0]}.\nTry converting it to {course[1]}.",
       "timestamp": "",
       "author": {
         "name": "",
@@ -254,7 +251,45 @@ async def convert_error(ctx, error):
         await ctx.send('Somthing went wrong')
 
 
+#View the bot credits.
+@bot.command()
+async def credits(ctx):
+    checkfiles(ctx.guild.id)
+    await ctx.send(content=None, embed=discord.Embed.from_dict(
+    {
+      "title": "Credits:",
+      "color": 0,
+      "description": "",
+      "timestamp": "",
+      "author": {
+        "name": "",
+        "icon_url": ""
+      },
+      "image": {},
+      "thumbnail": {},
+      "footer": {},
+      "fields": [
+        {
+      "name": "Bot Author",
+      "value":  '''
+        **Quinn Burke**
+        My stuff can be found here:
+        [Github](https://github.com/Stanback/)
+        [Twitter](https://twitter.com/Qlbbl1111)
+        Qlbbl#1111
 
+                '''
+        },
+        {
+      "name": "A big thanks to Brian Stanback for the conversion formulas.",
+      "value":  '''
+        His GitHub can be found [here](https://github.com/Stanback/).
+
+                '''
+        }
+      ]
+    }
+  ))
 
 #RUN
 if __name__ == "__main__":
