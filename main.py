@@ -85,7 +85,7 @@ async def help(ctx):
         },
         {
           "name": f"{prefix}test",
-          "value": f"Used to test the bot.\nCommand format is:\n`{prefix} optional_agrs'"
+          "value": f"Used to test the bot.\nCommand format is:\n`{prefix} optional_agrs`"
         },
         {
           "name": f"{prefix}convert",
