@@ -81,15 +81,19 @@ async def help(ctx):
       "fields": [
         {
           "name": f"{prefix}help",
-          "value": "Used to bring up this menu."
+          "value": f"Used to bring up this menu."
         },
         {
           "name": f"{prefix}test",
-          "value": "Used to test the bot."
+          "value": f"Used to test the bot.\nCommand format is:\n`{prefix} optional_agrs"
         },
         {
           "name": f"{prefix}convert",
-          "value": f"Command format is: \n`{prefix}convert course[scy/lcm] time[00:00.00] distance[100] stroke[free]`"
+          "value": f"Used to convert LCM to and from SCY.\nCommand format is:\n`{prefix}convert course[scy/lcm] time[00:00.00] distance[100] stroke[free]`"
+        },
+          {
+          "name": f"{prefix}pace",
+          "value": f"Used to get goal pace calculations for your swims.\nCommand format is:\n`{prefix}pace goal_time[2:00.00] race_distance[200] split[50] (optional)practice[y/n]`"
         }
       ]
     }
