@@ -104,7 +104,7 @@ async def test(ctx, *arg):
 
 @test.error
 async def test_error(ctx, error):
-    await ctx.send('Somthing went wrong')
+    await ctx.send(f"Error: {error}")
  
 #All the available events
 @bot.command()
@@ -247,9 +247,102 @@ async def convert(ctx, course, time, distance, stroke):
 
 @convert.error
 async def convert_error(ctx, error):
-    if isinstance(error, commands.BadArgument):
-        await ctx.send('Somthing went wrong')
+    await ctx.send(f"Error: {error}")
 
+
+#Pace calculator
+@bot.command()
+async def pace(ctx, goal, distance, split, practice="n"):
+    checkfiles(ctx.guild.id)
+    pace ="pace"
+    pace = getpace(goal, distance, split, practice)
+    if pace != "Error" and practice.lower() == "n":
+        await ctx.send(content=None, embed=discord.Embed.from_dict(
+    {
+      "title": f"Here's your {split} pace to go {goal}:",
+      "color": 0,
+      "description": f"{pace}",
+      "timestamp": "",
+      "author": {
+        "name": "",
+        "icon_url": ""
+      },
+      "image": {},
+      "thumbnail": {},
+      "footer": {},
+      "fields": []
+    }
+  ))
+    elif pace != "Error" and practice.lower() == "y":
+        await ctx.send(content=None, embed=discord.Embed.from_dict(
+    {
+      "title": f"Here's your {split} pace to go {goal} in practice:",
+      "color": 0,
+      "description": f"{pace}",
+      "timestamp": "",
+      "author": {
+        "name": "",
+        "icon_url": ""
+      },
+      "image": {},
+      "thumbnail": {},
+      "footer": {
+        "text": "Practice mode takes into account the dive by adding 2 seconds to your goal time before calculating.",
+
+      },
+      "fields": []
+    }
+  ))  
+    elif pace == "Error":
+        await ctx.send(content=None, embed=discord.Embed.from_dict(
+    {
+      "title": "Error: Invalid Distance or Split",
+      "color": 0,
+      "description": f"""
+      **Valid Distances:**
+      - 100
+      - 200
+      - 400
+      - 500
+
+      **Valid Splits:**
+      - 25
+      - 50
+      - 100
+      """,
+      "timestamp": "",
+      "author": {
+        "name": "",
+        "icon_url": ""
+      },
+      "image": {},
+      "thumbnail": {},
+      "footer": {},
+      "fields": []
+    }
+  ))
+
+@pace.error
+async def pace_error(ctx, error):
+    await ctx.send(content=None, embed=discord.Embed.from_dict(
+    {
+      "title": f"Error: {error}",
+      "color": 0,
+      "description": f"Command format is:\n`{prefix}pace goal_time[2:00.00] race_distance[200] split[50] (optional)practice[y/n]`",
+      "timestamp": "",
+      "author": {
+        "name": "",
+        "icon_url": ""
+      },
+      "image": {},
+      "thumbnail": {},
+      "footer": {
+        "text": "Practice mode takes into account the dive by adding 2 seconds to your goal time before calculating.",
+
+      },
+      "fields": []
+    }
+  ))
 
 #View the bot credits.
 @bot.command()

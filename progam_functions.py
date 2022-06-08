@@ -129,6 +129,64 @@ def gettime(course, time, distance, stroke):
         return "Error"
 
     return swimtime(newtime)
-    
+
+def getpace(goal, distance, split, practice):
+    x = seconds(goal)
+
+    pacecalc = {
+    "100": {
+        "25": x/4,
+        "50": x/2,
+        "100": x/1
+        },
+    "200": {
+        "25": x/8,
+        "50": x/4,
+        "100": x/2
+        },
+    "400": {
+        "25": x/16,
+        "50": x/8,
+        "100": x/4
+        },
+    "500": {
+        "25": x/20,
+        "50": x/10,
+        "100": x/5
+        }
+    }
+    practicepacecalc = {
+    "100": {
+        "25": (x+2)/4,
+        "50": (x+2)/2,
+        "100": (x+2)/1
+        },
+    "200": {
+        "25": (x+2)/8,
+        "50": (x+2)/4,
+        "100": (x+2)/2
+        },
+    "400": {
+        "25": (x+2)/16,
+        "50": (x+2)/8,
+        "100": (x+2)/4
+        },
+    "500": {
+        "25": (x+2)/20,
+        "50": (x+2)/10,
+        "100": (x+2)/5
+        }
+    }
+
+    try:
+        if practice.lower() == "n":
+            pace = pacecalc.get(distance.lower()).get(split.lower())
+        if practice.lower() == "y":
+            pace = practicepacecalc.get(distance.lower()).get(split.lower())
+        return swimtime(pace)
+    except:
+        return "Error"
+
+
 
 
